@@ -33,9 +33,17 @@ UBookmark is a private, password-protected personal bookmark manager for Chrome.
 
 ## Install locally
 
+### Download a release package
+
+1. Visit the [UBookmark releases page](https://github.com/jayforson/Ubookmark/releases).
+2. Download `UBookmark-1.0.0.zip` from the latest release and extract it to a permanent folder.
+3. Continue with the Chrome installation steps below, selecting the extracted folder.
+
+### Load unpacked in Chrome
+
 1. Open Chrome and navigate to `chrome://extensions`.
 2. Enable **Developer mode**.
-3. Select **Load unpacked** and choose this project folder.
+3. Select **Load unpacked** and choose the downloaded package's extracted folder, or this project folder when developing locally.
 4. Select the UBookmark toolbar icon to open the dashboard.
 
 ## Use in incognito

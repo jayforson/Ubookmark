@@ -119,6 +119,7 @@ button:active { transform: translateY(1px); }
 .folder-tree-row:hover, .folder-tree-row.is-active { background: var(--surface-alt); }
 .folder-tree-row.is-active { border-color: color-mix(in srgb, var(--accent) 35%, var(--border)); }
 .folder-tree-row.is-drop-target { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
+.folder-tree-row.is-dragging { opacity: .45; }
 .folder-select-button { overflow: hidden; padding: .35rem .45rem; border: 0; border-radius: 6px; background: transparent; color: var(--text); font-size: .87rem; font-weight: 650; text-align: left; text-overflow: ellipsis; white-space: nowrap; }
 .folder-select-button:hover { color: var(--accent); }
 .folder-count { min-width: 1.35rem; padding: .05rem .35rem; border-radius: 99px; background: var(--surface); color: var(--muted); font-size: .72rem; text-align: center; }
@@ -127,10 +128,13 @@ button:active { transform: translateY(1px); }
 .folder-open-button:disabled { cursor: not-allowed; opacity: .5; }
 .folder-delete-button { min-height: 1.9rem; padding: .28rem .5rem; border: 1px solid transparent; border-radius: 6px; background: transparent; color: var(--muted); font-size: .74rem; font-weight: 650; }
 .folder-delete-button:hover { background: color-mix(in srgb, var(--danger) 12%, transparent); color: var(--danger); }
+.folder-end-drop-zone { min-height: 1.6rem; margin: -.1rem 0 .15rem 1.35rem; padding: .25rem .6rem; border: 1px dashed var(--border); border-radius: 7px; color: var(--muted); font-size: .74rem; text-align: center; transition: color .15s, background .15s, border-color .15s; }
+.folder-end-drop-zone.is-drop-target { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); color: var(--accent); }
 .tree-bookmark-item { margin-left: 1.35rem; border-color: transparent; }
 .tree-bookmark-item .bookmark-link { padding-left: .25rem; }
 .tree-bookmark-item.root-bookmark-item { margin-left: 0; }
 .bookmark-item.is-dragging { opacity: .4; }
+.bookmark-item.is-drop-target { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 12%, var(--surface)); }
 .settings-panel { display: grid; grid-template-columns: .65fr 1.35fr; gap: 1.5rem; margin-top: 1.3rem; padding: 1.35rem; }
 .password-form { display: grid; grid-template-columns: repeat(3, 1fr); align-items: end; gap: .7rem; margin-top: 1rem; }
 .password-form-actions { display: flex; grid-column: 1 / -1; gap: .65rem; }

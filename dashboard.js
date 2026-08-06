@@ -320,6 +320,21 @@ function createBookmarkElement(bookmark) {
     item.classList.add("is-dragging");
   });
   item.addEventListener("dragend", () => item.classList.remove("is-dragging"));
+  item.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+    item.classList.add("is-drop-target");
+  });
+  item.addEventListener("dragleave", () => item.classList.remove("is-drop-target"));
+  item.addEventListener("drop", async (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    item.classList.remove("is-drop-target");
+    const bookmarkId = event.dataTransfer.getData("text/plain");
+    const bounds = item.getBoundingClientRect();
+    const placeAfter = event.clientY > bounds.top + bounds.height / 2;
+    if (bookmarkId && bookmarkId !== bookmark.id) await reorderBookmark(bookmarkId, bookmark.id, placeAfter);
+  });
 
   const link = document.createElement("a");
   link.className = "bookmark-link";
@@ -387,9 +402,45 @@ function renderBookmarks() {
 }
 
 async function moveBookmarkToFolder(bookmarkId, folderId) {
-  bookmarks = bookmarks.map((bookmark) => bookmark.id === bookmarkId ? { ...bookmark, folderId } : bookmark);
+  const movedBookmark = bookmarks.find((bookmark) => bookmark.id === bookmarkId);
+  if (!movedBookmark) return;
+  const remainingBookmarks = bookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
+  const updatedBookmark = { ...movedBookmark, folderId: folderId || null };
+  let insertAfterIndex = -1;
+  remainingBookmarks.forEach((bookmark, index) => {
+    if ((bookmark.folderId || null) === (folderId || null)) insertAfterIndex = index;
+  });
+  remainingBookmarks.splice(insertAfterIndex + 1, 0, updatedBookmark);
+  bookmarks = remainingBookmarks;
   await storageSet({ [STORAGE_KEYS.bookmarks]: bookmarks });
   renderBookmarks();
+  renderFolders();
+}
+
+async function reorderBookmark(bookmarkId, targetBookmarkId, placeAfter = false) {
+  const movedBookmark = bookmarks.find((bookmark) => bookmark.id === bookmarkId);
+  const targetBookmark = bookmarks.find((bookmark) => bookmark.id === targetBookmarkId);
+  if (!movedBookmark || !targetBookmark) return;
+
+  const updatedBookmark = { ...movedBookmark, folderId: targetBookmark.folderId || null };
+  const remainingBookmarks = bookmarks.filter((bookmark) => bookmark.id !== bookmarkId);
+  const targetIndex = remainingBookmarks.findIndex((bookmark) => bookmark.id === targetBookmarkId);
+  remainingBookmarks.splice(targetIndex + (placeAfter ? 1 : 0), 0, updatedBookmark);
+  bookmarks = remainingBookmarks;
+  await storageSet({ [STORAGE_KEYS.bookmarks]: bookmarks });
+  renderFolders();
+}
+
+async function reorderFolder(folderId, targetFolderId, placeAfter = false) {
+  if (folderId === targetFolderId) return;
+  const movedFolder = folders.find((folder) => folder.id === folderId);
+  if (!movedFolder) return;
+  const remainingFolders = folders.filter((folder) => folder.id !== folderId);
+  const targetIndex = remainingFolders.findIndex((folder) => folder.id === targetFolderId);
+  if (targetIndex < 0) return;
+  remainingFolders.splice(targetIndex + (placeAfter ? 1 : 0), 0, movedFolder);
+  folders = remainingFolders;
+  await storageSet({ [STORAGE_KEYS.folders]: folders });
   renderFolders();
 }
 
@@ -412,6 +463,13 @@ function renderFolders() {
     row.className = "folder-tree-row";
     row.setAttribute("role", "treeitem");
     row.tabIndex = 0;
+    row.draggable = true;
+    row.addEventListener("dragstart", (event) => {
+      event.dataTransfer.effectAllowed = "move";
+      event.dataTransfer.setData("text/plain", `folder:${folder.id}`);
+      row.classList.add("is-dragging");
+    });
+    row.addEventListener("dragend", () => row.classList.remove("is-dragging"));
     const label = document.createElement("button");
     label.className = "folder-select-button";
     label.type = "button";
@@ -434,8 +492,13 @@ function renderFolders() {
     row.addEventListener("drop", async (event) => {
       event.preventDefault();
       row.classList.remove("is-drop-target");
-      const bookmarkId = event.dataTransfer.getData("text/plain");
-      if (bookmarkId) await moveBookmarkToFolder(bookmarkId, folder.id);
+      const draggedItem = event.dataTransfer.getData("text/plain");
+      if (draggedItem.startsWith("folder:")) {
+        const bounds = row.getBoundingClientRect();
+        await reorderFolder(draggedItem.slice("folder:".length), folder.id, event.clientY > bounds.top + bounds.height / 2);
+      } else if (draggedItem) {
+        await moveBookmarkToFolder(draggedItem, folder.id);
+      }
     });
     const count = document.createElement("span");
     count.className = "folder-count";
@@ -465,13 +528,31 @@ function renderFolders() {
     });
     row.append(label, count, openButton, deleteButton);
     const nodes = [row];
-    if (isExpanded) nodes.push(...folderBookmarks.map((bookmark) => createBookmarkNode(bookmark)));
+    if (isExpanded) {
+      nodes.push(...folderBookmarks.map((bookmark) => createBookmarkNode(bookmark)));
+      const endDropZone = document.createElement("div");
+      endDropZone.className = "folder-end-drop-zone";
+      endDropZone.textContent = "Drop here to place at the end";
+      endDropZone.addEventListener("dragover", (event) => {
+        event.preventDefault();
+        event.dataTransfer.dropEffect = "move";
+        endDropZone.classList.add("is-drop-target");
+      });
+      endDropZone.addEventListener("dragleave", () => endDropZone.classList.remove("is-drop-target"));
+      endDropZone.addEventListener("drop", async (event) => {
+        event.preventDefault();
+        endDropZone.classList.remove("is-drop-target");
+        const bookmarkId = event.dataTransfer.getData("text/plain");
+        if (bookmarkId) await moveBookmarkToFolder(bookmarkId, folder.id);
+      });
+      nodes.push(endDropZone);
+    }
     return nodes;
   };
 
   const rootBookmarks = visibleBookmarks.filter((bookmark) => !bookmark.folderId);
   const nodes = [];
-  folders.sort((left, right) => left.name.localeCompare(right.name)).forEach((folder) => {
+  folders.forEach((folder) => {
     nodes.push(...createFolderNode(folder));
   });
   nodes.push(...rootBookmarks.map((bookmark) => createBookmarkNode(bookmark, true)));

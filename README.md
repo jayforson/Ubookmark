@@ -11,7 +11,7 @@ UBookmark is a private, password-protected personal bookmark manager for Chrome.
 - Flexible link input: conventional addresses automatically receive `https://`, while supported links with another URI scheme are retained as entered. Unsafe `javascript:` and `data:` links are blocked.
 - Search saved title, URL, tags, and notes. Matching bookmarks update as the user types.
 - Website favicons are loaded from each saved website when available, with a letter-based fallback when a site has no favicon.
-- The bookmark area is a folder-first tree. Create folders there, click a folder to expand or collapse its bookmarks, and drag a bookmark onto a folder to move it. Bookmarks without a folder appear at the same level as folders. Select **Open all** to launch a folder's links in new tabs.
+- The bookmark area is a folder-first tree. Create folders there, click a folder to expand or collapse its bookmarks, and drag folders to reorder them. Drag a bookmark onto a folder to move it. Drop on the upper half of another bookmark to place it before, or the lower half to place it after; use the drop area beneath an expanded folder to place it last. Bookmarks without a folder appear at the same level as folders. Select **Open all** to launch a folder's links in new tabs.
 - Double-click a folder name to rename it. Empty folders delete immediately; deleting a folder with bookmarks requires confirmation and permanently removes its contents.
 - Import selected native Chrome bookmarks or folders with **Import Chrome bookmarks**. Imported Chrome folders become UBookmark folders; nested Chrome folders are imported as separate folders because UBookmark folders are one level deep.
 - Persistent bookmarks, password data, and theme preference via `chrome.storage.local`.

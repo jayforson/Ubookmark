@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "UBookmark",
+  "version": "1.0.0",
+  "description": "A private, password-protected bookmark manager for saving and opening your favorite websites.",
+  "permissions": ["storage", "tabs", "bookmarks"],
+  "incognito": "split",
+  "action": {
+    "default_title": "Open UBookmark",
+    "default_icon": "icon.svg"
+  },
+  "background": {
+    "service_worker": "background.js"
+  }
+}

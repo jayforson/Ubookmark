@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>UBookmark</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="shell">
+    <section class="auth-card" id="setupView" hidden aria-labelledby="setupTitle">
+      <div class="brand-mark" aria-hidden="true">U</div>
+      <p class="eyebrow">Private bookmarks</p>
+      <h1 id="setupTitle">Create your vault</h1>
+      <p class="muted">Choose a password to protect the bookmarks saved on this device.</p>
+      <form id="setupForm" class="form-stack">
+        <label>Password
+          <input id="setupPassword" type="password" autocomplete="new-password" required>
+        </label>
+        <label>Confirm password
+          <input id="setupConfirm" type="password" autocomplete="new-password" required>
+        </label>
+        <p class="form-message" id="setupMessage" aria-live="polite"></p>
+        <button class="primary" type="submit">Create vault</button>
+      </form>
+    </section>
+
+    <section class="auth-card" id="unlockView" hidden aria-labelledby="unlockTitle">
+      <div class="brand-mark" aria-hidden="true">U</div>
+      <p class="eyebrow">UBookmark</p>
+      <h1 id="unlockTitle">Welcome back</h1>
+      <p class="muted">Enter your password to access your bookmarks.</p>
+      <form id="unlockForm" class="form-stack">
+        <label>Password
+          <input id="unlockPassword" type="password" autocomplete="current-password" required>
+        </label>
+        <p class="form-message" id="unlockMessage" aria-live="polite"></p>
+        <button class="primary" type="submit">Unlock</button>
+      </form>
+      <button class="text-button" id="forgotPasswordButton" type="button">Forgot password?</button>
+      <p class="auth-copyright">© 2026 UBookmark</p>
+    </section>
+
+    <section id="appView" hidden>
+      <header class="app-header">
+        <div>
+          <p class="eyebrow">UBookmark</p>
+          <h1>Your saved places</h1>
+        </div>
+        <div class="header-actions">
+          <button class="header-icon-button" id="themeModeButton" type="button" aria-label="Theme: automatic" title="Theme: automatic">◐</button>
+          <button class="secondary" id="showPasswordFormButton" type="button">Change password</button>
+          <button class="header-icon-button" id="lockButton" type="button" aria-label="Lock vault" title="Lock vault">🔒</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <aside class="panel add-panel">
+          <h2>Add a bookmark</h2>
+          <form id="bookmarkForm" class="form-stack">
+            <label>Title
+              <input id="bookmarkTitle" type="text" maxlength="100" placeholder="e.g. Daily reading" required>
+            </label>
+            <label>Website address
+              <input id="bookmarkUrl" type="text" maxlength="2048" placeholder="example.com, https://example.com, or another link format" required>
+            </label>
+            <label>Tags <span class="optional">Optional · separate with commas</span>
+              <input id="bookmarkTags" type="text" maxlength="300" placeholder="reading, work, inspiration">
+            </label>
+            <label>Note <span class="optional">Optional</span>
+              <textarea id="bookmarkNote" maxlength="1000" placeholder="Why save this?"></textarea>
+            </label>
+            <p class="form-message" id="bookmarkMessage" aria-live="polite"></p>
+            <button class="primary" type="submit">Save bookmark</button>
+          </form>
+        </aside>
+
+        <section class="panel bookmarks-panel" aria-labelledby="foldersTitle">
+          <div class="section-heading">
+            <div class="bookmarks-heading">
+              <div>
+              <h2 id="foldersTitle">Bookmarks</h2>
+              <p id="bookmarkCount" class="muted">0 saved</p>
+              </div>
+              <button class="secondary import-button" id="importChromeButton" type="button" aria-label="Import bookmarks directly from your current Chrome browser" title="Import bookmarks directly from your current Chrome browser">⇩ Import</button>
+            </div>
+            <div class="bookmark-tools">
+              <label class="search-control">Search
+                <input id="bookmarkSearch" type="search" placeholder="Search title, URL, tag, or note">
+              </label>
+            </div>
+          </div>
+          <div class="folder-browser">
+            <div class="folder-browser-heading">
+              <p class="muted">Open folders to see their bookmarks. Drag a bookmark onto a folder to move it.</p>
+              <div class="folder-browser-actions">
+                <button class="secondary folder-create-button" id="createFolderButton" type="button">New folder</button>
+              </div>
+            </div>
+            <div id="emptyState" class="empty-state">
+              <span aria-hidden="true">☆</span>
+              <h3>No bookmarks or folders yet</h3>
+              <p>Create a folder or save a bookmark to get started.</p>
+            </div>
+            <div class="folder-tree" id="folderTree" role="tree" aria-label="Bookmark folders and saved bookmarks"></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="panel settings-panel" id="passwordPanel" aria-labelledby="settingsTitle" hidden>
+        <div>
+          <h2 id="settingsTitle">Update password</h2>
+          <p class="muted">Confirm the current password before choosing a new one.</p>
+        </div>
+        <form id="passwordForm" class="password-form" hidden>
+          <label>Current password
+            <input id="currentPassword" type="password" autocomplete="current-password" required>
+          </label>
+          <label>New password
+            <input id="newPassword" type="password" autocomplete="new-password" required>
+          </label>
+          <label>Confirm new password
+            <input id="newPasswordConfirm" type="password" autocomplete="new-password" required>
+          </label>
+          <div class="password-form-actions">
+            <button class="primary" type="submit">Update password</button>
+            <button class="secondary" id="cancelPasswordButton" type="button">Cancel</button>
+          </div>
+          <p class="form-message" id="passwordMessage" aria-live="polite"></p>
+        </form>
+      </section>
+    </section>
+
+    <section class="modal-backdrop" id="resetDialog" hidden role="dialog" aria-modal="true" aria-labelledby="resetTitle">
+      <div class="reset-dialog">
+        <p class="eyebrow">Permanent action</p>
+        <h2 id="resetTitle">Reset this vault?</h2>
+        <p class="muted">This deletes the password and all saved bookmarks from this browser. This cannot be undone.</p>
+        <form id="resetForm" class="form-stack">
+          <label>Type <strong>DELETE</strong> to confirm
+            <input id="resetConfirmation" type="text" autocomplete="off" required>
+          </label>
+          <p class="form-message" id="resetMessage" aria-live="polite"></p>
+          <div class="dialog-actions">
+            <button class="danger" type="submit">Delete all data</button>
+            <button class="secondary" id="cancelResetButton" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="modal-backdrop" id="folderDialog" hidden role="dialog" aria-modal="true" aria-labelledby="folderDialogTitle">
+      <div class="reset-dialog">
+        <p class="eyebrow">Organize bookmarks</p>
+        <h2 id="folderDialogTitle">Create a folder</h2>
+        <form id="folderForm" class="form-stack">
+          <label>Folder name
+            <input id="folderName" type="text" maxlength="80" autocomplete="off" required>
+          </label>
+          <p class="form-message" id="folderMessage" aria-live="polite"></p>
+          <div class="dialog-actions">
+            <button class="primary" id="saveFolderButton" type="submit">Create folder</button>
+            <button class="secondary" id="cancelFolderButton" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="modal-backdrop" id="deleteFolderDialog" hidden role="dialog" aria-modal="true" aria-labelledby="deleteFolderTitle">
+      <div class="reset-dialog">
+        <p class="eyebrow">Permanent action</p>
+        <h2 id="deleteFolderTitle">Delete this folder?</h2>
+        <p class="muted" id="deleteFolderDescription"></p>
+        <div class="dialog-actions dialog-actions-spaced">
+          <button class="danger" id="confirmDeleteFolderButton" type="button">Delete folder and bookmarks</button>
+          <button class="secondary" id="cancelDeleteFolderButton" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal-backdrop" id="importDialog" hidden role="dialog" aria-modal="true" aria-labelledby="importTitle">
+      <div class="reset-dialog import-dialog">
+        <p class="eyebrow">Chrome bookmarks</p>
+        <h2 id="importTitle">Import bookmarks</h2>
+        <p class="muted">Select bookmarks or folders to copy into UBookmark. Chrome folders are recreated as UBookmark folders.</p>
+        <form id="importForm" class="form-stack">
+          <div class="import-tree" id="importTree" aria-label="Chrome bookmarks available for import"></div>
+          <p class="form-message" id="importMessage" aria-live="polite"></p>
+          <div class="dialog-actions">
+            <button class="primary" id="confirmImportButton" type="submit">Import selected</button>
+            <button class="secondary" id="cancelImportButton" type="button">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+  </main>
+  <script src="dashboard.js"></script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
+  <title>UBookmark</title>
+  <defs>
+    <linearGradient id="background" x1="20" y1="12" x2="108" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6e84ff"/>
+      <stop offset="1" stop-color="#354de0"/>
+    </linearGradient>
+  </defs>
+  <rect width="128" height="128" rx="31" fill="url(#background)"/>
+  <path fill="#fff" d="M32 31h17v39c0 12 5 18 15 18s15-6 15-18V31h17v40c0 23-12 35-32 35S32 94 32 71V31Z"/>
+  <path fill="#cfd6ff" d="M88 25h16v35l-8-6-8 6V25Z"/>
+</svg>

@@ -1,12 +1,18 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title">
   <title>UBookmark</title>
   <defs>
-    <linearGradient id="background" x1="20" y1="12" x2="108" y2="116" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#6e84ff"/>
-      <stop offset="1" stop-color="#354de0"/>
+    <linearGradient id="background" x1="18" y1="12" x2="110" y2="116" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#7389ff"/>
+      <stop offset="1" stop-color="#3149dc"/>
+    </linearGradient>
+    <linearGradient id="bookmark" x1="41" y1="29" x2="88" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e6eaff"/>
     </linearGradient>
   </defs>
   <rect width="128" height="128" rx="31" fill="url(#background)"/>
-  <path fill="#fff" d="M32 31h17v39c0 12 5 18 15 18s15-6 15-18V31h17v40c0 23-12 35-32 35S32 94 32 71V31Z"/>
-  <path fill="#cfd6ff" d="M88 25h16v35l-8-6-8 6V25Z"/>
+  <circle cx="64" cy="64" r="44" fill="#ffffff" fill-opacity=".12"/>
+  <path d="M41 30c0-5 4-9 9-9h28c5 0 9 4 9 9v70c0 4-5 7-9 4L64 94l-14 10c-4 3-9 0-9-4V30Z" fill="url(#bookmark)"/>
+  <path d="M55 44h18M55 56h18" stroke="#5369e8" stroke-width="6" stroke-linecap="round"/>
+  <path d="m64 66 4.4 8.8 9.7 1.4-7 6.8 1.7 9.6L64 87.9l-8.8 4.7 1.7-9.6-7-6.8 9.7-1.4L64 66Z" fill="#f3b64e"/>
 </svg>

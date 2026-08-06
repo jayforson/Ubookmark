@@ -58,6 +58,8 @@ This extension is designed for personal use on a single Chrome profile. All UBoo
 
 Chrome manages extension-profile storage; however, `chrome.storage.local` is not a dedicated encrypted vault. If the password is forgotten, it cannot be recovered. Use **Forgot password?** and type `DELETE` to permanently clear the vault and create a new one.
 
+See the full [Privacy Policy](PRIVACY.md).
+
 ## Optional support
 
 UBookmark is free to use for personal and commercial purposes. Selecting **Tip the developer** first displays a disclosure that confirms the contribution is entirely optional, is not required for any feature, and does not purchase a license, additional features, support, or future updates. Users may then optionally continue to [Buy Me a Coffee](https://buymeacoffee.com/jayforson), which handles payments under its own terms and privacy practices.

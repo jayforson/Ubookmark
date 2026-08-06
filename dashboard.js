@@ -51,6 +51,9 @@ const elements = {
   deleteFolderDescription: document.querySelector("#deleteFolderDescription"),
   confirmDeleteFolderButton: document.querySelector("#confirmDeleteFolderButton"),
   cancelDeleteFolderButton: document.querySelector("#cancelDeleteFolderButton"),
+  supportButton: document.querySelector("#supportButton"),
+  supportDialog: document.querySelector("#supportDialog"),
+  closeSupportButton: document.querySelector("#closeSupportButton"),
   themeModeButton: document.querySelector("#themeModeButton"),
   lockButton: document.querySelector("#lockButton"),
   passwordPanel: document.querySelector("#passwordPanel"),
@@ -164,6 +167,10 @@ function closeImportDialog() {
 function closeDeleteFolderDialog() {
   folderPendingDeletion = null;
   elements.deleteFolderDialog.hidden = true;
+}
+
+function closeSupportDialog() {
+  elements.supportDialog.hidden = true;
 }
 
 async function deleteFolder(folder, deleteBookmarks) {
@@ -610,6 +617,13 @@ elements.folderForm.addEventListener("submit", async (event) => {
 });
 
 elements.cancelDeleteFolderButton.addEventListener("click", closeDeleteFolderDialog);
+
+elements.supportButton.addEventListener("click", () => {
+  elements.supportDialog.hidden = false;
+  elements.closeSupportButton.focus();
+});
+
+elements.closeSupportButton.addEventListener("click", closeSupportDialog);
 
 elements.confirmDeleteFolderButton.addEventListener("click", async () => {
   if (!folderPendingDeletion) return;

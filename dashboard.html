@@ -130,6 +130,10 @@
           <p class="form-message" id="passwordMessage" aria-live="polite"></p>
         </form>
       </section>
+
+      <footer class="support-footer">
+        <button class="support-link" id="supportButton" type="button">☕ Tip the developer</button>
+      </footer>
     </section>
 
     <section class="modal-backdrop" id="resetDialog" hidden role="dialog" aria-modal="true" aria-labelledby="resetTitle">
@@ -175,6 +179,19 @@
         <div class="dialog-actions dialog-actions-spaced">
           <button class="danger" id="confirmDeleteFolderButton" type="button">Delete folder and bookmarks</button>
           <button class="secondary" id="cancelDeleteFolderButton" type="button">Cancel</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="modal-backdrop" id="supportDialog" hidden role="dialog" aria-modal="true" aria-labelledby="supportTitle">
+      <div class="reset-dialog support-dialog">
+        <p class="eyebrow">Optional support</p>
+        <h2 id="supportTitle">Support UBookmark</h2>
+        <p class="muted">UBookmark is free software for personal and commercial use. A contribution is a voluntary tip for the developer's work and does not purchase the extension, a license, additional features, priority support, or any guarantee of future updates.</p>
+        <p class="muted">No contribution is required to install, access, or use any UBookmark feature. Payments are handled independently by Buy Me a Coffee under its own terms and privacy practices.</p>
+        <div class="dialog-actions dialog-actions-spaced">
+          <a class="primary support-donation-link" href="https://buymeacoffee.com/jayforson" target="_blank" rel="noopener noreferrer">Continue to Buy Me a Coffee</a>
+          <button class="secondary" id="closeSupportButton" type="button">Cancel</button>
         </div>
       </div>
     </section>

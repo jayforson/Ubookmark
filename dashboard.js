@@ -47,6 +47,10 @@ const elements = {
   importMessage: document.querySelector("#importMessage"),
   confirmImportButton: document.querySelector("#confirmImportButton"),
   cancelImportButton: document.querySelector("#cancelImportButton"),
+  exportJsonButton: document.querySelector("#exportJsonButton"),
+  importJsonButton: document.querySelector("#importJsonButton"),
+  importJsonFile: document.querySelector("#importJsonFile"),
+  backupMessage: document.querySelector("#backupMessage"),
   deleteFolderDialog: document.querySelector("#deleteFolderDialog"),
   deleteFolderDescription: document.querySelector("#deleteFolderDescription"),
   confirmDeleteFolderButton: document.querySelector("#confirmDeleteFolderButton"),
@@ -56,14 +60,15 @@ const elements = {
   closeSupportButton: document.querySelector("#closeSupportButton"),
   themeModeButton: document.querySelector("#themeModeButton"),
   lockButton: document.querySelector("#lockButton"),
-  passwordPanel: document.querySelector("#passwordPanel"),
+  settingsDialog: document.querySelector("#settingsDialog"),
+  settingsButton: document.querySelector("#settingsButton"),
+  closeSettingsButton: document.querySelector("#closeSettingsButton"),
+  togglePasswordButton: document.querySelector("#togglePasswordButton"),
   forgotPasswordButton: document.querySelector("#forgotPasswordButton"),
   resetDialog: document.querySelector("#resetDialog"),
   resetConfirmation: document.querySelector("#resetConfirmation"),
   resetMessage: document.querySelector("#resetMessage"),
-  cancelResetButton: document.querySelector("#cancelResetButton"),
-  showPasswordFormButton: document.querySelector("#showPasswordFormButton"),
-  cancelPasswordButton: document.querySelector("#cancelPasswordButton")
+  cancelResetButton: document.querySelector("#cancelResetButton")
 };
 
 let credentials = null;
@@ -248,12 +253,101 @@ function importChromeNode(node, folderId = null) {
   node.children.forEach((child) => importChromeNode(child, importedFolderId));
 }
 
-function hidePasswordForm() {
+const MAX_IMPORT_FILE_BYTES = 10 * 1024 * 1024;
+
+function countLabel(count, singular, plural) {
+  return `${count} ${count === 1 ? singular : plural}`;
+}
+
+async function exportBookmarksToJson() {
+  if (!authenticated) return;
+  if (typeof window.showSaveFilePicker !== "function") {
+    setMessage(elements.backupMessage, "Choosing a save location is not supported in this browser. Open UBookmark in Chrome to export.", true);
+    return;
+  }
+  const exported = UBookmarkBackup.createExportData(folders, bookmarks);
+  const suggestedName = `ubookmark-export-${exported.exportedAt.slice(0, 10)}.json`;
+  elements.exportJsonButton.disabled = true;
+  try {
+    // The system save dialog lets the user pick both the folder and the
+    // file name (and confirm overwriting an existing file) instead of the
+    // export landing in the Downloads folder automatically.
+    const fileHandle = await window.showSaveFilePicker({
+      suggestedName,
+      types: [{ description: "UBookmark JSON export", accept: { "application/json": [".json"] } }]
+    });
+    const writable = await fileHandle.createWritable();
+    await writable.write(JSON.stringify(exported, null, 2));
+    await writable.close();
+    setMessage(elements.backupMessage, `Exported ${countLabel(bookmarks.length, "bookmark", "bookmarks")} in ${countLabel(folders.length, "folder", "folders")} to ${fileHandle.name || suggestedName}.`);
+  } catch (error) {
+    if (error?.name === "AbortError") setMessage(elements.backupMessage, "Export cancelled.");
+    else setMessage(elements.backupMessage, "Export failed. Choose a writable folder and try again.", true);
+  } finally {
+    elements.exportJsonButton.disabled = false;
+  }
+}
+
+async function importBookmarksFromJsonFile(file) {
+  if (!authenticated || !file) return;
+  if (file.size > MAX_IMPORT_FILE_BYTES) {
+    setMessage(elements.backupMessage, "That file is too large to import (over 10 MB).", true);
+    elements.importJsonFile.value = "";
+    return;
+  }
+  elements.importJsonButton.disabled = true;
+  try {
+    let data;
+    try {
+      data = JSON.parse(await file.text());
+    } catch {
+      throw new Error("That file is not valid JSON.");
+    }
+    // mergeBackup validates first and returns new arrays, so a rejected file
+    // or a file full of duplicates never touches stored data.
+    const merged = UBookmarkBackup.mergeBackup(folders, bookmarks, data, { normalizeUrl: normalizedUrl });
+    const { stats } = merged;
+    if (stats.bookmarksAdded || stats.foldersAdded) {
+      folders = merged.folders;
+      bookmarks = merged.bookmarks;
+      await storageSet({ [STORAGE_KEYS.bookmarks]: bookmarks, [STORAGE_KEYS.folders]: folders });
+      renderFolders();
+    }
+    const skipped = [];
+    if (stats.bookmarksSkippedDuplicate) skipped.push(`${countLabel(stats.bookmarksSkippedDuplicate, "duplicate bookmark", "duplicate bookmarks")} already in the same folder`);
+    if (stats.bookmarksSkippedInvalid) skipped.push(countLabel(stats.bookmarksSkippedInvalid, "invalid entry", "invalid entries"));
+    if (stats.foldersSkippedInvalid) skipped.push(countLabel(stats.foldersSkippedInvalid, "invalid folder", "invalid folders"));
+    const importedSummary = stats.bookmarksAdded || stats.foldersAdded
+      ? `Imported ${countLabel(stats.bookmarksAdded, "bookmark", "bookmarks")}${stats.foldersAdded ? ` and created ${countLabel(stats.foldersAdded, "new folder", "new folders")}` : ""}.`
+      : "Nothing new to import.";
+    setMessage(elements.backupMessage, skipped.length ? `${importedSummary} Skipped ${skipped.join(" and ")}.` : importedSummary);
+  } catch (error) {
+    setMessage(elements.backupMessage, error.message || "That file could not be imported.", true);
+  } finally {
+    elements.importJsonButton.disabled = false;
+    // Reset so choosing the same file again re-runs the import (all duplicates).
+    elements.importJsonFile.value = "";
+  }
+}
+
+function setPasswordFormExpanded(expanded) {
+  elements.passwordForm.hidden = !expanded;
+  elements.togglePasswordButton.setAttribute("aria-expanded", String(expanded));
+  elements.togglePasswordButton.textContent = `🔑 Change password ${expanded ? "▾" : "▸"}`;
+}
+
+function openSettingsDialog() {
+  setPasswordFormExpanded(false);
+  elements.settingsDialog.hidden = false;
+  elements.closeSettingsButton.focus();
+}
+
+function closeSettingsDialog() {
   elements.passwordForm.reset();
-  elements.passwordForm.hidden = true;
-  elements.passwordPanel.hidden = true;
-  elements.showPasswordFormButton.hidden = false;
+  setPasswordFormExpanded(false);
+  elements.settingsDialog.hidden = true;
   setMessage(elements.passwordMessage);
+  setMessage(elements.backupMessage);
 }
 
 function getAutoTheme() {
@@ -649,6 +743,16 @@ elements.cancelFolderButton.addEventListener("click", closeFolderDialog);
 
 elements.importChromeButton.addEventListener("click", openImportDialog);
 
+elements.exportJsonButton.addEventListener("click", exportBookmarksToJson);
+
+elements.importJsonButton.addEventListener("click", () => {
+  elements.importJsonFile.click();
+});
+
+elements.importJsonFile.addEventListener("change", async () => {
+  await importBookmarksFromJsonFile(elements.importJsonFile.files?.[0]);
+});
+
 elements.cancelImportButton.addEventListener("click", closeImportDialog);
 
 elements.importForm.addEventListener("submit", async (event) => {
@@ -730,14 +834,19 @@ elements.passwordForm.addEventListener("submit", async (event) => {
   setMessage(elements.passwordMessage, "Password updated successfully.");
 });
 
-elements.showPasswordFormButton.addEventListener("click", () => {
-  elements.passwordPanel.hidden = false;
-  elements.passwordForm.hidden = false;
-  elements.showPasswordFormButton.hidden = true;
-  elements.currentPassword.focus();
-});
+elements.settingsButton.addEventListener("click", openSettingsDialog);
 
-elements.cancelPasswordButton.addEventListener("click", hidePasswordForm);
+elements.closeSettingsButton.addEventListener("click", closeSettingsDialog);
+
+elements.togglePasswordButton.addEventListener("click", () => {
+  const expanded = elements.passwordForm.hidden;
+  setPasswordFormExpanded(expanded);
+  if (expanded) elements.currentPassword.focus();
+  else {
+    elements.passwordForm.reset();
+    setMessage(elements.passwordMessage);
+  }
+});
 
 elements.forgotPasswordButton.addEventListener("click", () => {
   elements.resetDialog.hidden = false;
@@ -778,7 +887,7 @@ elements.themeModeButton.addEventListener("click", async () => {
 
 elements.lockButton.addEventListener("click", () => {
   authenticated = false;
-  hidePasswordForm();
+  closeSettingsDialog();
   elements.unlockForm.reset();
   setMessage(elements.unlockMessage);
   showView("unlock");

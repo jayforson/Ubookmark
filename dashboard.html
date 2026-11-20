@@ -50,7 +50,7 @@
         </div>
         <div class="header-actions">
           <button class="header-icon-button" id="themeModeButton" type="button" aria-label="Theme: automatic" title="Theme: automatic">◐</button>
-          <button class="secondary" id="showPasswordFormButton" type="button">Change password</button>
+          <button class="header-icon-button" id="settingsButton" type="button" aria-haspopup="dialog" aria-controls="settingsDialog" aria-label="Settings" title="Settings">⚙</button>
           <button class="header-icon-button" id="lockButton" type="button" aria-label="Lock vault" title="Lock vault">🔒</button>
         </div>
       </header>
@@ -83,7 +83,7 @@
               <h2 id="foldersTitle">Bookmarks</h2>
               <p id="bookmarkCount" class="muted">0 saved</p>
               </div>
-              <button class="secondary import-button" id="importChromeButton" type="button" aria-label="Import bookmarks directly from your current Chrome browser" title="Import bookmarks directly from your current Chrome browser">⇩ Import</button>
+              <button class="secondary import-button" id="importChromeButton" type="button" aria-label="Import bookmarks directly from your current Chrome browser" title="Import bookmarks directly from your current Chrome browser">⇩ Import Chrome</button>
             </div>
             <div class="bookmark-tools">
               <label class="search-control">Search
@@ -108,32 +108,45 @@
         </section>
       </div>
 
-      <section class="panel settings-panel" id="passwordPanel" aria-labelledby="settingsTitle" hidden>
-        <div>
-          <h2 id="settingsTitle">Update password</h2>
-          <p class="muted">Confirm the current password before choosing a new one.</p>
-        </div>
-        <form id="passwordForm" class="password-form" hidden>
-          <label>Current password
-            <input id="currentPassword" type="password" autocomplete="current-password" required>
-          </label>
-          <label>New password
-            <input id="newPassword" type="password" autocomplete="new-password" required>
-          </label>
-          <label>Confirm new password
-            <input id="newPasswordConfirm" type="password" autocomplete="new-password" required>
-          </label>
-          <div class="password-form-actions">
-            <button class="primary" type="submit">Update password</button>
-            <button class="secondary" id="cancelPasswordButton" type="button">Cancel</button>
-          </div>
-          <p class="form-message" id="passwordMessage" aria-live="polite"></p>
-        </form>
-      </section>
-
       <footer class="support-footer">
         <button class="support-link" id="supportButton" type="button">☕ Tip the developer</button>
       </footer>
+    </section>
+
+    <section class="modal-backdrop" id="settingsDialog" hidden role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
+      <div class="reset-dialog settings-dialog">
+        <div class="settings-heading">
+          <h2 id="settingsTitle">⚙ Settings</h2>
+          <button class="icon-button" id="closeSettingsButton" type="button" aria-label="Close settings" title="Close settings">✕</button>
+        </div>
+        <div class="settings-section">
+          <h3>💾 Backup</h3>
+          <div class="backup-actions">
+            <button class="secondary" id="exportJsonButton" type="button" aria-label="Export all folders and bookmarks to a JSON file you choose" title="Export to a JSON file you choose">⇧ Export</button>
+            <button class="secondary" id="importJsonButton" type="button" aria-label="Import folders and bookmarks from a UBookmark JSON export" title="Import from a UBookmark JSON export">⇩ Import</button>
+            <input id="importJsonFile" type="file" accept="application/json,.json" hidden>
+          </div>
+          <p class="form-message backup-message" id="backupMessage" aria-live="polite"></p>
+        </div>
+        <div class="settings-section">
+          <button class="secondary settings-toggle-button" id="togglePasswordButton" type="button" aria-expanded="false" aria-controls="passwordForm" title="Change password">🔑 Change password ▸</button>
+          <form id="passwordForm" class="password-form" hidden>
+            <label>Current password
+              <input id="currentPassword" type="password" autocomplete="current-password" required>
+            </label>
+            <label>New password
+              <input id="newPassword" type="password" autocomplete="new-password" required>
+            </label>
+            <label>Confirm new password
+              <input id="newPasswordConfirm" type="password" autocomplete="new-password" required>
+            </label>
+            <div class="password-form-actions">
+              <button class="primary" type="submit" title="Update password">🔑 Update</button>
+            </div>
+            <p class="form-message" id="passwordMessage" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
     </section>
 
     <section class="modal-backdrop" id="resetDialog" hidden role="dialog" aria-modal="true" aria-labelledby="resetTitle">
@@ -212,6 +225,7 @@
       </div>
     </section>
   </main>
+  <script src="backup.js"></script>
   <script src="dashboard.js"></script>
 </body>
 </html>
